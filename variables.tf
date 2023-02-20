@@ -37,19 +37,20 @@ variable "transfer_job_excluded_prefixes" {
 variable "buckets_list" {
   type = list(object({
     name                     = string
+    append_random_suffix     = optional(bool, true)
     location                 = optional(string, null)
     storage_class            = optional(string, "STANDARD")
     enable_versioning        = optional(bool, true)
     enable_disaster_recovery = optional(bool, true)
   }))
-  description = "The list of buckets to create. For each bucket you can specify the name, the location (default to project region), the storage class (default to STANDARD), if you want enable the object versioning (default to true), and if you want to plan a disaster recovery with the creation of a mirroring bucket with a scheduled transfer job."
+  description = "The list of buckets to create. For each bucket you can specify the name, the location (default to project region), the storage class (default to STANDARD), if you want enable the object versioning (default to true), if you want to plan a disaster recovery with the creation of a mirroring bucket with a scheduled transfer job and if you want to append a random suffix to the bucket name (default true)."
 
   validation {
     # The Bucket name can contain only lower caps letters, numbers and "-" and "_". It also must start and end with a lower caps letter or number.
     condition = alltrue([
       for b in var.buckets_list :
-      can(regex("^[0-9a-z]{1}[0-9a-z_-]{4,61}[0-9a-z]{1}$", b.name))
+      can(regex("^[0-9a-z]{1}[0-9a-z_-]{4,56}[0-9a-z]{1}$", b.name))
     ])
-    error_message = "Bucket names can only contain lowercase letters, numeric characters, dashes (-), underscores (_). Bucket names must start and end with a number or letter. Bucket names must contain 6-63 characters. We do not allow dots (.) even if they are allowed as per documentation https://cloud.google.com/storage/docs/buckets#naming"
+    error_message = "Bucket names can only contain lowercase letters, numeric characters, dashes (-), underscores (_). Bucket names must start and end with a number or letter. Bucket names must contain 6-58 characters (5 chars are reserved for random suffix). We do not allow dots (.) even if they are allowed as per documentation https://cloud.google.com/storage/docs/buckets#naming"
   }
 }

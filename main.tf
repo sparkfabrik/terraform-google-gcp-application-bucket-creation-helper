@@ -3,12 +3,17 @@ data "google_client_config" "current" {}
 
 locals {
   default_region = data.google_client_config.current.region
+  generated_bucket_names = {
+    for bucket in var.buckets_list : bucket.name =>
+    bucket.append_random_suffix ? "${bucket.name}-${random_id.resources_suffix[bucket.name].hex}" : bucket.name
+  }
 }
 
-# Randomize resource's names to prevent collisions.
+# Add a random resource to randomize resource's names to prevent collisions.
+# The generated random_id is 4 characters long.
 resource "random_id" "resources_suffix" {
   for_each    = { for bucket in var.buckets_list : bucket.name => bucket }
-  byte_length = 3
+  byte_length = 2
 }
 
 # ----------------------
@@ -16,7 +21,7 @@ resource "random_id" "resources_suffix" {
 # ----------------------
 resource "google_storage_bucket" "application" {
   for_each      = { for bucket in var.buckets_list : bucket.name => bucket }
-  name          = each.value.name
+  name          = local.generated_bucket_names[each.value.name]
   location      = each.value.location != null ? each.value.location : local.default_region
   storage_class = each.value.storage_class
   force_destroy = var.bucket_force_destroy
@@ -58,7 +63,9 @@ resource "google_service_account" "application_bucket" {
 
 # Generate the storage HMAC key for the application bucket SA
 resource "google_storage_hmac_key" "bucket_hmackey" {
-  for_each              = { for bucket in var.buckets_list : bucket.name => bucket }
+  for_each = {
+    for bucket in var.buckets_list : bucket.name => bucket
+  }
   service_account_email = google_service_account.application_bucket[each.value.name].email
 }
 
@@ -72,7 +79,7 @@ resource "google_storage_bucket_iam_member" "objadmin" {
 
 # Make bucket objects readable by all.
 # We assume that the application's assets/files are publicly accessible, which is the typical case for a web application.
-resource "google_storage_bucket_iam_member" "viewers" {
+resource "google_storage_bucket_iam_member" "viewer" {
   for_each = { for bucket in var.buckets_list : bucket.name => bucket }
   bucket   = google_storage_bucket.application[each.value.name].name
   role     = "roles/storage.objectViewer"
@@ -91,7 +98,9 @@ locals {
 
 # Replica buckets used for disaster recovery.
 resource "google_storage_bucket" "disaster_recovery" {
-  for_each      = { for bucket in local.buckets_with_disaster_recovery : bucket.name => bucket }
+  for_each = {
+    for bucket in local.buckets_with_disaster_recovery : bucket.name => bucket
+  }
   name          = "dr-${substr(each.value.name, 0, 60)}"
   location      = var.disaster_recovery_bucket_location != "" ? var.disaster_recovery_bucket_location : each.value.location != null ? each.value.location : local.default_region
   storage_class = each.value.storage_class
@@ -114,27 +123,33 @@ data "google_storage_transfer_project_service_account" "default" {
 # Assign legacy writer role on disaster recovery bucket to the SA used to
 # synchronize application bucket with the disaster recovery bucket.
 resource "google_storage_bucket_iam_member" "disaster_recovery_legacy_writer" {
-  for_each = { for bucket in local.buckets_with_disaster_recovery : bucket.name => bucket }
-  bucket   = google_storage_bucket.disaster_recovery[each.value.name].name
-  role     = "roles/storage.legacyBucketWriter"
-  member   = "serviceAccount:${data.google_storage_transfer_project_service_account.default[0].email}"
+  for_each = {
+    for bucket in local.buckets_with_disaster_recovery : bucket.name => bucket
+  }
+  bucket = google_storage_bucket.disaster_recovery[each.value.name].name
+  role   = "roles/storage.legacyBucketWriter"
+  member = "serviceAccount:${data.google_storage_transfer_project_service_account.default[0].email}"
 }
 
 # Set read permission on source buckets.
 # The roles/storage.objectViewer and roles/storage.legacyBucketReader roles together contain
 # the permissions that are always required for the source.
 resource "google_storage_bucket_iam_member" "disaster_recovery_legacy_reader" {
-  for_each = { for bucket in local.buckets_with_disaster_recovery : bucket.name => bucket }
-  bucket   = google_storage_bucket.application[each.value.name].name
-  role     = "roles/storage.legacyBucketReader"
-  member   = "serviceAccount:${data.google_storage_transfer_project_service_account.default[0].email}"
+  for_each = {
+    for bucket in local.buckets_with_disaster_recovery : bucket.name => bucket
+  }
+  bucket = google_storage_bucket.application[each.value.name].name
+  role   = "roles/storage.legacyBucketReader"
+  member = "serviceAccount:${data.google_storage_transfer_project_service_account.default[0].email}"
 }
 
 # ----------------------------------------
 # Configure the scheduled DR transfer job
 # ----------------------------------------
 resource "google_storage_transfer_job" "application_bucket_nightly_backup" {
-  for_each    = { for bucket in local.buckets_with_disaster_recovery : bucket.name => bucket }
+  for_each = {
+    for bucket in local.buckets_with_disaster_recovery : bucket.name => bucket
+  }
   description = "Daily backup of application bucket ${google_storage_bucket.application[each.value.name].name} to the disaster recovery bucket ${google_storage_bucket.disaster_recovery[each.value.name].name}"
   project     = var.project_id
 
