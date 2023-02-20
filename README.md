@@ -15,6 +15,28 @@ entire region.
 To enable disaster recovery, the API "storagetransfer.googleapis.com" must be
 enabled.
 
+The input variale `buckets_list` is a list of objects, each object representing a 
+bucket resource with configurable parameters; this is the single object structure:
+
+```terraform
+  {
+    name                     = string
+    append_random_suffix     = optional(bool, true)
+    location                 = optional(string, null)
+    storage_class            = optional(string, "STANDARD")
+    enable_versioning        = optional(bool, true)
+    enable_disaster_recovery = optional(bool, true)
+  }
+```
+
+The only mandatory parameter is the name of the bucket, the rest are optional 
+with the defaults values shown above.
+
+By default, the module will append a random suffix to the name of the bucket to
+prevent name collisions. If you want to disable this feature, set the 
+`append_random_suffix` to `false` for the given bucket. This may be useful if
+want to import existing buckets with a known name.
+
 <!-- BEGIN_TF_DOCS -->
 ## Providers
 

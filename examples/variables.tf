@@ -11,6 +11,7 @@ variable "region" {
 variable "buckets_list" {
   type = list(object({
     name                     = string
+    append_random_suffix     = optional(bool, true)
     location                 = optional(string, null)
     storage_class            = optional(string, "STANDARD")
     enable_versioning        = optional(bool, true)
