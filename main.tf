@@ -24,7 +24,7 @@ resource "google_storage_bucket" "application" {
   name          = local.generated_bucket_names[each.value.name]
   location      = each.value.location != null ? each.value.location : local.default_region
   storage_class = each.value.storage_class
-  force_destroy = var.bucket_force_destroy
+  force_destroy = each.value.force_destroy
 
   versioning {
     enabled = each.value.enable_versioning
@@ -104,7 +104,7 @@ resource "google_storage_bucket" "disaster_recovery" {
   name          = "dr-${substr(each.value.name, 0, 60)}"
   location      = var.disaster_recovery_bucket_location != "" ? var.disaster_recovery_bucket_location : each.value.location != null ? each.value.location : local.default_region
   storage_class = each.value.storage_class
-  force_destroy = var.bucket_force_destroy
+  force_destroy = each.value.force_destroy
 
   versioning {
     enabled = true
