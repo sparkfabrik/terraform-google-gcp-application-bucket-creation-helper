@@ -101,7 +101,7 @@ resource "google_storage_bucket" "disaster_recovery" {
   for_each = {
     for bucket in local.buckets_with_disaster_recovery : bucket.name => bucket
   }
-  name          = "dr-${substr(each.value.name, 0, 60)}"
+  name          = "dr-${substr(each.value.name, 0, 49)}-replicated"
   location      = var.disaster_recovery_bucket_location != "" ? var.disaster_recovery_bucket_location : each.value.location != null ? each.value.location : local.default_region
   storage_class = each.value.storage_class
   force_destroy = each.value.force_destroy
