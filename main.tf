@@ -12,7 +12,9 @@ locals {
 # Add a random resource to randomize resource's names to prevent collisions.
 # The generated random_id is 4 characters long.
 resource "random_id" "resources_suffix" {
-  for_each    = { for bucket in var.buckets_list : bucket.name => bucket }
+  for_each = { for bucket in var.buckets_list : bucket.name => bucket
+    if bucket.append_random_suffix == true
+  }
   byte_length = 2
 }
 
