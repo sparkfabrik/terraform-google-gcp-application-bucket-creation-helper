@@ -80,9 +80,9 @@ resource "google_storage_bucket_iam_member" "objadmin" {
 # Make bucket objects readable by all.
 # We assume that the application's assets/files are publicly accessible, which is the typical case for a web application.
 resource "google_storage_bucket_iam_member" "viewer" {
-  for_each = { for bucket in var.buckets_list : bucket.name => bucket }
+  for_each = { for bucket in var.buckets_list : bucket.name => bucket if bucket.set_all_users_as_viewer }
   bucket   = google_storage_bucket.application[each.value.name].name
-  role     = "roles/storage.objectViewer"
+  role     = "roles/storage.legacyObjectReader"
   member   = "allUsers"
 }
 
