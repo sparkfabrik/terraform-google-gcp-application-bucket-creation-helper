@@ -1,12 +1,23 @@
-# Data resources.
+# Data resources. 
 data "google_client_config" "current" {}
 
 locals {
   default_region = data.google_client_config.current.region
+
   generated_bucket_names = {
     for bucket in var.buckets_list : bucket.name =>
     bucket.append_random_suffix ? "${bucket.name}-${random_id.resources_suffix[bucket.name].hex}" : bucket.name
   }
+
+  generated_map_bucket_tags = distinct(flatten([
+    for bucket in var.buckets_list : [
+      for tag_value in var.google_tags_value_list : {
+        bucket_name     = local.generated_bucket_names[bucket.name]
+        bucket_location = bucket.location
+        tag_value       = tag_value
+      }
+    ]
+  ]))
 }
 
 # Add a random resource to randomize resource's names to prevent collisions.
@@ -25,6 +36,7 @@ resource "google_storage_bucket" "application" {
   location      = each.value.location != null ? each.value.location : local.default_region
   storage_class = each.value.storage_class
   force_destroy = each.value.force_destroy
+  labels        = each.value.labels
 
   versioning {
     enabled = each.value.enable_versioning
@@ -38,6 +50,16 @@ resource "google_storage_bucket" "application" {
       log_bucket = var.logging_bucket_name
     }
   }
+}
+
+# ------------------------------
+# Binding Google Tags to buckets
+# ------------------------------
+resource "google_tags_location_tag_binding" "binding" {
+  for_each  = { for bucket_tag in local.generated_map_bucket_tags : "${bucket_tag.bucket_name}.${bucket_tag.bucket_location}.${bucket_tag.tag_value}" => bucket_tag }
+  parent    = "//storage.googleapis.com/projects/_/buckets/${each.value.bucket_name}"
+  tag_value = "tagValues/tagBindings/{parent}/${each.value.tag_value}"
+  location  = each.value.bucket_location != null ? each.value.bucket_location : local.default_region
 }
 
 # -------------------------------
