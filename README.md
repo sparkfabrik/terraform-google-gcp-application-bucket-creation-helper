@@ -21,11 +21,13 @@ bucket resource with configurable parameters; this is the single object structur
 ```terraform
   {
     name                     = string
+    force_destroy            = optional(bool, false)
     append_random_suffix     = optional(bool, true)
     location                 = optional(string, null)
     storage_class            = optional(string, "STANDARD")
     enable_versioning        = optional(bool, true)
     enable_disaster_recovery = optional(bool, true)
+    set_all_users_as_viewer  = optional(bool, false)
   }
 ```
 
