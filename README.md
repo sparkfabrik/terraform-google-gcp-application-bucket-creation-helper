@@ -26,7 +26,9 @@ bucket resource with configurable parameters; this is the single object structur
     storage_class            = optional(string, "STANDARD")
     enable_versioning        = optional(bool, true)
     enable_disaster_recovery = optional(bool, true)
-    labels                   = optional (map)
+    set_all_users_as_viewer  = optional(bool, false)
+    labels                   = optional(map(string), {})
+    tags                     = optional(list(string), [])
   }
 ```
 

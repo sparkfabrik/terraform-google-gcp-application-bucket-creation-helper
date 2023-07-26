@@ -11,7 +11,7 @@ locals {
 
   generated_map_bucket_tags = distinct(flatten([
     for bucket in var.buckets_list : [
-      for tag_value in var.google_tags_value_list : {
+      for tag_value in bucket.tags : {
         bucket_name     = local.generated_bucket_names[bucket.name]
         bucket_location = bucket.location
         tag_value       = tag_value
@@ -56,7 +56,7 @@ resource "google_storage_bucket" "application" {
 # Binding Google Tags to buckets
 # ------------------------------
 resource "google_tags_location_tag_binding" "binding" {
-  for_each  = { for bucket_tag in local.generated_map_bucket_tags : "${bucket_tag.bucket_name}.${bucket_tag.bucket_location}.${bucket_tag.tag_value}" => bucket_tag }
+  for_each  = { for bucket_tag in local.generated_map_bucket_tags : "${bucket_tag.bucket_name}--${bucket_tag.bucket_location}--${bucket_tag.tag_value}" => bucket_tag }
   parent    = "//storage.googleapis.com/projects/_/buckets/${each.value.bucket_name}"
   tag_value = "tagValues/tagBindings/{parent}/${each.value.tag_value}"
   location  = each.value.bucket_location != null ? each.value.bucket_location : local.default_region

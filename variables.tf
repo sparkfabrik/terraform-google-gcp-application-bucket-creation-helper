@@ -39,6 +39,7 @@ variable "buckets_list" {
     enable_disaster_recovery = optional(bool, true)
     set_all_users_as_viewer  = optional(bool, false)
     labels                   = optional(map(string), {})
+    tags                     = optional(list(string), [])
   }))
   description = "The list of buckets to create. For each bucket you can specify the name, when deleting a bucket the force_destroy option will delete the contents of the bucket (if you try to delete a bucket that contains objects, Terraform will fail that run), the location (default to project region), the storage class (default to STANDARD), if you want enable the object versioning (default to true), if you want to plan a disaster recovery with the creation of a mirroring bucket with a scheduled transfer job and if you want to append a random suffix to the bucket name (default true). The property set_all_users_as_viewer controls if the bucket will be readable by all users (default false)."
 
@@ -52,8 +53,3 @@ variable "buckets_list" {
   }
 }
 
-variable "google_tags_value_list" {
-  type        = list(string)
-  description = "Tags key list to apply to cloud storage buckets created for fine-grained access control"
-  default     = []
-}
