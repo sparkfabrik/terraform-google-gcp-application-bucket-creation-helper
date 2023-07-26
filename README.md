@@ -21,6 +21,7 @@ bucket resource with configurable parameters; this is the single object structur
 ```terraform
   {
     name                     = string
+    force_destroy            = optional(bool, false)
     append_random_suffix     = optional(bool, true)
     location                 = optional(string, null)
     storage_class            = optional(string, "STANDARD")
