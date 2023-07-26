@@ -18,6 +18,27 @@ locals {
       }
     ]
   ]))
+
+  # This map is generated only if user fill at least one entry.
+  generated_map_bucket_writers = distinct(flatten([
+    for bucket in var.buckets_list : [
+      for writer in bucket.writers : {
+        bucket_name   = local.generated_bucket_names[bucket.name]
+        bucket_writer = writer
+      }
+    ]
+  ]))
+
+  # This map is generated only if user fill at least one entry.
+  generated_map_bucket_readers = distinct(flatten([
+    for bucket in var.buckets_list : [
+      for reader in bucket.readers : {
+        bucket_name   = local.generated_bucket_names[bucket.name]
+        bucket_reader = reader
+      }
+    ]
+  ]))
+
 }
 
 # Add a random resource to randomize resource's names to prevent collisions.
@@ -106,6 +127,22 @@ resource "google_storage_bucket_iam_member" "viewer" {
   bucket   = google_storage_bucket.application[each.value.name].name
   role     = "roles/storage.legacyObjectReader"
   member   = "allUsers"
+}
+
+# Default Writer Role
+resource "google_storage_bucket_iam_member" "default_writer" {
+  for_each = { for bucket in local.generated_map_bucket_writers : "${bucket.bucket_name}--${bucket.bucket_writer}" => bucket if length(bucket.bucket_writers) > 0 }
+  bucket   = google_storage_bucket.application[each.value.name].name
+  role     = "roles/storage.objectCreator"
+  member   = each.value.bucket_writer
+}
+
+# Default Reader Role
+resource "google_storage_bucket_iam_member" "default_reader" {
+  for_each = { for bucket in local.generated_map_bucket_readers : "${bucket.bucket_name}--${bucket.bucket_reader}" => bucket if length(bucket.bucket_readers) > 0 }
+  bucket   = google_storage_bucket.application[each.value.name].name
+  role     = "roles/storage.objectViewer"
+  member   = each.value.bucket_reader
 }
 
 # ----------------------
