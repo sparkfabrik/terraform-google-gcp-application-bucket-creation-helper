@@ -13,6 +13,10 @@ buckets_list = [
       env = "stage"
       app = "mysite"
     }
+    bucket_readers = [
+      "group:test-gcp-ops@test.example.com",
+      "user:test-gcp-ops-user@test.example.com"
+    ]
   },
   {
     name                    = "app-prod"
@@ -21,6 +25,10 @@ buckets_list = [
     tag_value_name_list = [
       "123456789012345",
       "098765432101234"
+    ]
+    bucket_writers = [
+      "group:test-gcp-ops@test.example.com",
+      "user:test-gcp-ops-user@test.example.com"
     ]
   },
 ]

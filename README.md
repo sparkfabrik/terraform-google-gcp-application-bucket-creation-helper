@@ -30,6 +30,8 @@ bucket resource with configurable parameters; this is the single object structur
     set_all_users_as_viewer  = optional(bool, false)
     labels                   = optional(map(string), {})
     tag_value_name_list      = optional(list(string), [])
+    bucket_writers           = optional(list(string), [])
+    bucket_readers           = optional(list(string), [])
   }
 ```
 
@@ -37,15 +39,19 @@ The only mandatory parameter is the name of the bucket, the rest are optional
 with the defaults values shown above.
 
 The property `set_all_users_as_viewer` controls if the bucket content will be
-readable by anonymous users (default false). 
+readable by anonymous users (default false).
 
-You can also pass a map of key/value label pairs to assign to the bucket using the 
-`labels` property, i.e. `{ env = "stage", app = "mysite" }`. 
+You can also pass a map of key/value label pairs to assign to the bucket using the
+`labels` property, i.e. `{ env = "stage", app = "mysite" }`.
 
-You can also pass a list of tags value names (where **the name is the  generated
-numeric id for the TagValue**, i.e. `["123456789012345","543210987654321"]`) to 
-bind to the bucket using the `tag_value_name_list` property. The tags must 
+You can also pass a list of tags value names (where **the name is the generated
+numeric id for the TagValue**, i.e. `["123456789012345","543210987654321"]`) to
+bind to the bucket using the `tag_value_name_list` property. The tags must
 exist in the project, otherwise the module will fail.
+
+You can optionally pass a list of bucket writers or reader in the form comma-delimited IAM-style
+(i.e `["group:test-gcp-ops@test.example.com","user:test-gcp-user-ops@test.example.com"]`), to assign
+a roles/storage.objectCreator for writers or roles/storage.objectViewer for readers to the pricipals set.
 
 By default, the module will append a random suffix to the name of the bucket to
 prevent name collisions. If you want to disable this feature, set the
@@ -53,50 +59,56 @@ prevent name collisions. If you want to disable this feature, set the
 want to import existing buckets with a known name.
 
 <!-- BEGIN_TF_DOCS -->
+
 ## Providers
 
-| Name | Version |
-|------|---------|
-| <a name="provider_google"></a> [google](#provider\_google) | 4.53.1 |
-| <a name="provider_random"></a> [random](#provider\_random) | 3.4.3 |
+| Name                                                      | Version |
+| --------------------------------------------------------- | ------- |
+| <a name="provider_google"></a> [google](#provider_google) | 4.53.1  |
+| <a name="provider_random"></a> [random](#provider_random) | 3.4.3   |
+
 ## Requirements
 
-| Name | Version |
-|------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.2 |
-| <a name="requirement_google"></a> [google](#requirement\_google) | >= 4.47.0 |
-| <a name="requirement_random"></a> [random](#requirement\_random) | >= 3.4.3 |
+| Name                                                                     | Version   |
+| ------------------------------------------------------------------------ | --------- |
+| <a name="requirement_terraform"></a> [terraform](#requirement_terraform) | >= 1.2    |
+| <a name="requirement_google"></a> [google](#requirement_google)          | >= 4.47.0 |
+| <a name="requirement_random"></a> [random](#requirement_random)          | >= 3.4.3  |
+
 ## Inputs
 
-| Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| <a name="input_buckets_list"></a> [buckets\_list](#input\_buckets\_list) | The list of buckets to create. For each bucket you can specify the name, when deleting a bucket the force\_destroy option will delete the contents of the bucket (if you try to delete a bucket that contains objects, Terraform will fail that run), the location (default to project region), the storage class (default to STANDARD), if you want enable the object versioning (default to true), if you want to plan a disaster recovery with the creation of a mirroring bucket with a scheduled transfer job and if you want to append a random suffix to the bucket name (default true). The property set\_all\_users\_as\_viewer controls if the bucket will be readable by all users (default false). The property labels set labels to organize buckets. The property tag\_value\_name\_list set google tags to bind with the bucket for fine grained access control. | <pre>list(object({<br>    name                     = string<br>    force_destroy            = optional(bool, false)<br>    append_random_suffix     = optional(bool, true)<br>    location                 = optional(string, null)<br>    storage_class            = optional(string, "STANDARD")<br>    enable_versioning        = optional(bool, true)<br>    enable_disaster_recovery = optional(bool, true)<br>    set_all_users_as_viewer  = optional(bool, false)<br>    labels                   = optional(map(string), {})<br>    tag_value_name_list      = optional(list(string), [])<br>  }))</pre> | n/a | yes |
-| <a name="input_disaster_recovery_bucket_location"></a> [disaster\_recovery\_bucket\_location](#input\_disaster\_recovery\_bucket\_location) | The location in which the disaster recovery bucket will be created. For a list of available regions, see https://cloud.google.com/storage/docs/locations. By default, the disaster recovery bucket will be created in the same location as the primary bucket. | `string` | `""` | no |
-| <a name="input_logging_bucket_name"></a> [logging\_bucket\_name](#input\_logging\_bucket\_name) | The name of the logging bucket. If not set, no logging bucket will be added and bucket logs will be disabled. | `string` | `""` | no |
-| <a name="input_project_id"></a> [project\_id](#input\_project\_id) | The Google Cloud project ID to deploy to. | `string` | n/a | yes |
-| <a name="input_transfer_job_excluded_prefixes"></a> [transfer\_job\_excluded\_prefixes](#input\_transfer\_job\_excluded\_prefixes) | A list of object file and folder prefixes that will be excluded from the transfer job. The default is designed for a typical Drupal application. | `list(string)` | <pre>[<br>  "public/css/css_",<br>  "public/js/js_",<br>  "public/google_tag/",<br>  "public/languages/",<br>  "public/styles/"<br>]</pre> | no |
+| Name                                                                                                                                 | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | Default                                                                                                                               | Required |
+| ------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------- | :------: |
+| <a name="input_buckets_list"></a> [buckets_list](#input_buckets_list)                                                                | The list of buckets to create. For each bucket you can specify the name, when deleting a bucket the force_destroy option will delete the contents of the bucket (if you try to delete a bucket that contains objects, Terraform will fail that run), the location (default to project region), the storage class (default to STANDARD), if you want enable the object versioning (default to true), if you want to plan a disaster recovery with the creation of a mirroring bucket with a scheduled transfer job and if you want to append a random suffix to the bucket name (default true). The property set_all_users_as_viewer controls if the bucket will be readable by all users (default false). The property labels set labels to organize buckets. The property tag_value_name_list set google tags to bind with the bucket for fine grained access control. | <pre>list(object({<br> name = string<br> force_destroy = optional(bool, false)<br> append_random_suffix = optional(bool, true)<br> location = optional(string, null)<br> storage_class = optional(string, "STANDARD")<br> enable_versioning = optional(bool, true)<br> enable_disaster_recovery = optional(bool, true)<br> set_all_users_as_viewer = optional(bool, false)<br> labels = optional(map(string), {})<br> tag_value_name_list = optional(list(string), [])<br> }))</pre> | n/a                                                                                                                                   |   yes    |
+| <a name="input_disaster_recovery_bucket_location"></a> [disaster_recovery_bucket_location](#input_disaster_recovery_bucket_location) | The location in which the disaster recovery bucket will be created. For a list of available regions, see https://cloud.google.com/storage/docs/locations. By default, the disaster recovery bucket will be created in the same location as the primary bucket.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | `""`                                                                                                                                  |    no    |
+| <a name="input_logging_bucket_name"></a> [logging_bucket_name](#input_logging_bucket_name)                                           | The name of the logging bucket. If not set, no logging bucket will be added and bucket logs will be disabled.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | `""`                                                                                                                                  |    no    |
+| <a name="input_project_id"></a> [project_id](#input_project_id)                                                                      | The Google Cloud project ID to deploy to.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | n/a                                                                                                                                   |   yes    |
+| <a name="input_transfer_job_excluded_prefixes"></a> [transfer_job_excluded_prefixes](#input_transfer_job_excluded_prefixes)          | A list of object file and folder prefixes that will be excluded from the transfer job. The default is designed for a typical Drupal application.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | `list(string)`                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | <pre>[<br> "public/css/css_",<br> "public/js/js_",<br> "public/google_tag/",<br> "public/languages/",<br> "public/styles/"<br>]</pre> |    no    |
+
 ## Outputs
 
-| Name | Description |
-|------|-------------|
-| <a name="output_buckets_access_credentials"></a> [buckets\_access\_credentials](#output\_buckets\_access\_credentials) | Access credentials for the application buckets |
+| Name                                                                                                              | Description                                    |
+| ----------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| <a name="output_buckets_access_credentials"></a> [buckets_access_credentials](#output_buckets_access_credentials) | Access credentials for the application buckets |
+
 ## Resources
 
-| Name | Type |
-|------|------|
-| [google_service_account.application_bucket](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/service_account) | resource |
-| [google_storage_bucket.application](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket) | resource |
-| [google_storage_bucket.disaster_recovery](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket) | resource |
-| [google_storage_bucket_iam_member.disaster_recovery_legacy_reader](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket_iam_member) | resource |
-| [google_storage_bucket_iam_member.disaster_recovery_legacy_writer](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket_iam_member) | resource |
-| [google_storage_bucket_iam_member.objadmin](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket_iam_member) | resource |
-| [google_storage_bucket_iam_member.viewer](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket_iam_member) | resource |
-| [google_storage_hmac_key.bucket_hmackey](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_hmac_key) | resource |
-| [google_storage_transfer_job.application_bucket_nightly_backup](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_transfer_job) | resource |
-| [google_tags_location_tag_binding.binding](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/tags_location_tag_binding) | resource |
-| [random_id.resources_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
-| [google_client_config.current](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/client_config) | data source |
+| Name                                                                                                                                                                                  | Type        |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| [google_service_account.application_bucket](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/service_account)                                           | resource    |
+| [google_storage_bucket.application](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket)                                                    | resource    |
+| [google_storage_bucket.disaster_recovery](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket)                                              | resource    |
+| [google_storage_bucket_iam_member.disaster_recovery_legacy_reader](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket_iam_member)          | resource    |
+| [google_storage_bucket_iam_member.disaster_recovery_legacy_writer](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket_iam_member)          | resource    |
+| [google_storage_bucket_iam_member.objadmin](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket_iam_member)                                 | resource    |
+| [google_storage_bucket_iam_member.viewer](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket_iam_member)                                   | resource    |
+| [google_storage_hmac_key.bucket_hmackey](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_hmac_key)                                             | resource    |
+| [google_storage_transfer_job.application_bucket_nightly_backup](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_transfer_job)                  | resource    |
+| [google_tags_location_tag_binding.binding](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/tags_location_tag_binding)                                  | resource    |
+| [random_id.resources_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id)                                                                       | resource    |
+| [google_client_config.current](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/client_config)                                                       | data source |
 | [google_storage_transfer_project_service_account.default](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/storage_transfer_project_service_account) | data source |
+
 ## Modules
 
 No modules.
