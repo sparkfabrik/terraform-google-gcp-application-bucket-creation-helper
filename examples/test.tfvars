@@ -13,7 +13,7 @@ buckets_list = [
       env = "stage"
       app = "mysite"
     }
-    bucket_readers = [
+    bucket_obj_vwr = [
       "group:test-gcp-ops@test.example.com",
       "user:test-gcp-ops-user@test.example.com"
     ]
@@ -26,7 +26,7 @@ buckets_list = [
       "123456789012345",
       "098765432101234"
     ]
-    bucket_writers = [
+    bucket_obj_adm = [
       "group:test-gcp-ops@test.example.com",
       "user:test-gcp-ops-user@test.example.com"
     ]

@@ -19,20 +19,20 @@ locals {
     ]
   ]))
 
-  generated_map_bucket_writers = distinct(flatten([
+  generated_map_bucket_obj_admin = distinct(flatten([
     for bucket in var.buckets_list : [
-      for writer in bucket.writers : {
-        bucket_name   = local.generated_bucket_names[bucket.name]
-        bucket_writer = writer
+      for bucket_obj_adm in bucket.bucket_obj_adm : {
+        bucket_name    = local.generated_bucket_names[bucket.name]
+        bucket_obj_adm = bucket_obj_adm
       }
     ]
   ]))
 
-  generated_map_bucket_readers = distinct(flatten([
+  generated_map_bucket_obj_vwr = distinct(flatten([
     for bucket in var.buckets_list : [
-      for reader in bucket.readers : {
-        bucket_name   = local.generated_bucket_names[bucket.name]
-        bucket_reader = reader
+      for bucket_obj_vwr in bucket.bucket_obj_vwr : {
+        bucket_name    = local.generated_bucket_names[bucket.name]
+        bucket_obj_vwr = bucket_obj_vwr
       }
     ]
   ]))
@@ -127,20 +127,20 @@ resource "google_storage_bucket_iam_member" "viewer" {
   member   = "allUsers"
 }
 
-# Default Writer Role
-resource "google_storage_bucket_iam_member" "default_writer" {
-  for_each = { for bucket in local.generated_map_bucket_writers : "${bucket.bucket_name}--${bucket.bucket_writer}" => bucket }
+# Default Storage Admin Role
+resource "google_storage_bucket_iam_member" "default_storage_admin" {
+  for_each = { for bucket in local.generated_map_bucket_obj_admin : "${bucket.bucket_name}--${bucket.bucket_obj_admin}" => bucket }
   bucket   = google_storage_bucket.application[each.value.name].name
-  role     = "roles/storage.objectCreator"
-  member   = each.value.bucket_writer
+  role     = "roles/storage.objectAdmin"
+  member   = each.value.bucket_obj_admin
 }
 
-# Default Reader Role
-resource "google_storage_bucket_iam_member" "default_reader" {
-  for_each = { for bucket in local.generated_map_bucket_readers : "${bucket.bucket_name}--${bucket.bucket_reader}" => bucket }
+# Default Storage Viewer Role
+resource "google_storage_bucket_iam_member" "default_storage_viewer" {
+  for_each = { for bucket in local.generated_map_bucket_obj_vwr : "${bucket.bucket_name}--${bucket.bucket_obj_vwr}" => bucket }
   bucket   = google_storage_bucket.application[each.value.name].name
   role     = "roles/storage.objectViewer"
-  member   = each.value.bucket_reader
+  member   = each.value.bucket_obj_vwr
 }
 
 # ----------------------

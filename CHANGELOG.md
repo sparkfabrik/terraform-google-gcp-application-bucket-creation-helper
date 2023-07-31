@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [Compare with previous version](https://github.com/sparkfabrik/terraform-google-gcp-application-bucket-creation-helper/compare/0.5.0...0.6.0)
 
-- Added support for default writer/readers roles
+- Added support for default admin/viewer roles
 
 ## [0.5.0] - 2023-07-27
 

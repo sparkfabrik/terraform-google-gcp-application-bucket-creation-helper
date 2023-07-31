@@ -30,8 +30,8 @@ bucket resource with configurable parameters; this is the single object structur
     set_all_users_as_viewer  = optional(bool, false)
     labels                   = optional(map(string), {})
     tag_value_name_list      = optional(list(string), [])
-    bucket_writers           = optional(list(string), [])
-    bucket_readers           = optional(list(string), [])
+    bucket_obj_adm           = optional(list(string), [])
+    bucket_obj_vwr           = optional(list(string), [])
   }
 ```
 
@@ -51,7 +51,7 @@ exist in the project, otherwise the module will fail.
 
 You can optionally pass a list of bucket writers or reader in the form comma-delimited IAM-style
 (i.e `["group:test-gcp-ops@test.example.com","user:test-gcp-user-ops@test.example.com"]`), to assign
-a roles/storage.objectCreator for writers or roles/storage.objectViewer for readers to the pricipals set.
+a roles/storage.objectAdmin for writers or roles/storage.objectViewer for readers to the pricipals set.
 
 By default, the module will append a random suffix to the name of the bucket to
 prevent name collisions. If you want to disable this feature, set the
@@ -76,7 +76,7 @@ want to import existing buckets with a known name.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_buckets_list"></a> [buckets\_list](#input\_buckets\_list) | The list of buckets to create. For each bucket you can specify the name, when deleting a bucket the force\_destroy option will delete the contents of the bucket (if you try to delete a bucket that contains objects, Terraform will fail that run), the location (default to project region), the storage class (default to STANDARD), if you want enable the object versioning (default to true), if you want to plan a disaster recovery with the creation of a mirroring bucket with a scheduled transfer job and if you want to append a random suffix to the bucket name (default true). The property set\_all\_users\_as\_viewer controls if the bucket will be readable by all users (default false). The property labels set labels to organize buckets. The property tag\_value\_name\_list set google tags to bind with the bucket for fine grained access control. Properties bucket\_readers and bucket\_writers set a list of specific IAM members as objectViewers and objectCreator | <pre>list(object({<br>    name                     = string<br>    force_destroy            = optional(bool, false)<br>    append_random_suffix     = optional(bool, true)<br>    location                 = optional(string, null)<br>    storage_class            = optional(string, "STANDARD")<br>    enable_versioning        = optional(bool, true)<br>    enable_disaster_recovery = optional(bool, true)<br>    set_all_users_as_viewer  = optional(bool, false)<br>    labels                   = optional(map(string), {})<br>    tag_value_name_list      = optional(list(string), [])<br>    bucket_writers           = optional(list(string), [])<br>    bucket_readers           = optional(list(string), [])<br>  }))</pre> | n/a | yes |
+| <a name="input_buckets_list"></a> [buckets\_list](#input\_buckets\_list) | The list of buckets to create. For each bucket you can specify the name, when deleting a bucket the force\_destroy option will delete the contents of the bucket (if you try to delete a bucket that contains objects, Terraform will fail that run), the location (default to project region), the storage class (default to STANDARD), if you want enable the object versioning (default to true), if you want to plan a disaster recovery with the creation of a mirroring bucket with a scheduled transfer job and if you want to append a random suffix to the bucket name (default true). The property set\_all\_users\_as\_viewer controls if the bucket will be readable by all users (default false). The property labels set labels to organize buckets. The property tag\_value\_name\_list set google tags to bind with the bucket for fine grained access control. Properties bucket\_readers and bucket\_writers set a list of specific IAM members as objectViewers and objectAdmin | <pre>list(object({<br>    name                     = string<br>    force_destroy            = optional(bool, false)<br>    append_random_suffix     = optional(bool, true)<br>    location                 = optional(string, null)<br>    storage_class            = optional(string, "STANDARD")<br>    enable_versioning        = optional(bool, true)<br>    enable_disaster_recovery = optional(bool, true)<br>    set_all_users_as_viewer  = optional(bool, false)<br>    labels                   = optional(map(string), {})<br>    tag_value_name_list      = optional(list(string), [])<br>    bucket_obj_adm           = optional(list(string), [])<br>    bucket_obj_vwr           = optional(list(string), [])<br>  }))</pre> | n/a | yes |
 | <a name="input_disaster_recovery_bucket_location"></a> [disaster\_recovery\_bucket\_location](#input\_disaster\_recovery\_bucket\_location) | The location in which the disaster recovery bucket will be created. For a list of available regions, see https://cloud.google.com/storage/docs/locations. By default, the disaster recovery bucket will be created in the same location as the primary bucket. | `string` | `""` | no |
 | <a name="input_logging_bucket_name"></a> [logging\_bucket\_name](#input\_logging\_bucket\_name) | The name of the logging bucket. If not set, no logging bucket will be added and bucket logs will be disabled. | `string` | `""` | no |
 | <a name="input_project_id"></a> [project\_id](#input\_project\_id) | The Google Cloud project ID to deploy to. | `string` | n/a | yes |
@@ -93,8 +93,8 @@ want to import existing buckets with a known name.
 | [google_service_account.application_bucket](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/service_account) | resource |
 | [google_storage_bucket.application](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket) | resource |
 | [google_storage_bucket.disaster_recovery](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket) | resource |
-| [google_storage_bucket_iam_member.default_reader](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket_iam_member) | resource |
-| [google_storage_bucket_iam_member.default_writer](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket_iam_member) | resource |
+| [google_storage_bucket_iam_member.default_storage_admin](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket_iam_member) | resource |
+| [google_storage_bucket_iam_member.default_storage_viewer](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket_iam_member) | resource |
 | [google_storage_bucket_iam_member.disaster_recovery_legacy_reader](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket_iam_member) | resource |
 | [google_storage_bucket_iam_member.disaster_recovery_legacy_writer](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket_iam_member) | resource |
 | [google_storage_bucket_iam_member.objadmin](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket_iam_member) | resource |
