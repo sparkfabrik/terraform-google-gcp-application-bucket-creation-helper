@@ -75,7 +75,7 @@ resource "google_storage_bucket" "application" {
 # Binding Google Tags to buckets
 # ------------------------------
 resource "google_tags_location_tag_binding" "binding" {
-  for_each  = { for bucket in local.generated_map_bucket_tags : "${bucket.bucket_name}--${bucket.bucket_location}--${bucket.tag_value_name}" => bucket }
+  for_each  = { for bucket in local.generated_map_bucket_tags : "${bucket.bucket_name}--${bucket.tag_value_name}" => bucket }
   parent    = "//storage.googleapis.com/projects/_/buckets/${each.value.bucket_name}"
   tag_value = "tagValues/${each.value.tag_value_name}"
   location  = each.value.bucket_location != null ? each.value.bucket_location : local.default_region

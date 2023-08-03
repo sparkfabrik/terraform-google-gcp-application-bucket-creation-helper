@@ -63,8 +63,8 @@ want to import existing buckets with a known name.
 
 | Name | Version |
 |------|---------|
-| <a name="provider_google"></a> [google](#provider\_google) | 4.74.0 |
-| <a name="provider_random"></a> [random](#provider\_random) | 3.5.1 |
+| <a name="provider_google"></a> [google](#provider\_google) | >= 4.47.0 |
+| <a name="provider_random"></a> [random](#provider\_random) | >= 3.4.3 |
 ## Requirements
 
 | Name | Version |
