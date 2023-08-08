@@ -10,3 +10,13 @@ output "buckets_access_credentials" {
     }
   }
 }
+
+output "details_of_used_tag_keys" {
+  description = "Details of all the tag keys passed to this module (globals and per bucket)."
+  value       = data.google_tags_tag_key.tag_keys
+}
+
+output "details_of_used_tag_values" {
+  description = "Details of all the tag values passed to this module (globals and per bucket)."
+  value       = data.google_tags_tag_value.tag_values
+}

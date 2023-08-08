@@ -27,6 +27,12 @@ variable "transfer_job_excluded_prefixes" {
   ]
 }
 
+variable "global_tags" {
+  description = "A list of tags to be applied to all the resources, in the form <TAG_KEY_SHORTNAME>/<TAG_VALUE_SHORTNAME>. If a resource specify a list of tags, the global tags will be overridden and replaced by those specified in the resource."
+  type        = list(string)
+  default     = []
+}
+
 # Optional value: refs https://developer.hashicorp.com/terraform/language/expressions/type-constraints#optional-object-type-attributes
 variable "buckets_list" {
   type = list(object({
@@ -39,11 +45,11 @@ variable "buckets_list" {
     enable_disaster_recovery = optional(bool, true)
     set_all_users_as_viewer  = optional(bool, false)
     labels                   = optional(map(string), {})
-    tag_value_name_list      = optional(list(string), [])
+    tag_list                 = optional(list(string), [])
     bucket_obj_adm           = optional(list(string), [])
     bucket_obj_vwr           = optional(list(string), [])
   }))
-  description = "The list of buckets to create. For each bucket you can specify the name, when deleting a bucket the force_destroy option will delete the contents of the bucket (if you try to delete a bucket that contains objects, Terraform will fail that run), the location (default to project region), the storage class (default to STANDARD), if you want enable the object versioning (default to true), if you want to plan a disaster recovery with the creation of a mirroring bucket with a scheduled transfer job and if you want to append a random suffix to the bucket name (default true). The property set_all_users_as_viewer controls if the bucket will be readable by all users (default false). The property labels set labels to organize buckets. The property tag_value_name_list set google tags to bind with the bucket for fine grained access control. Properties bucket_readers and bucket_writers set a list of specific IAM members as objectViewers and objectAdmin"
+  description = "The list of buckets to create. For each bucket you can specify the name, when deleting a bucket the force_destroy option will delete the contents of the bucket (if you try to delete a bucket that contains objects, Terraform will fail that run), the location (default to project region), the storage class (default to STANDARD), if you want enable the object versioning (default to true), if you want to plan a disaster recovery with the creation of a mirroring bucket with a scheduled transfer job and if you want to append a random suffix to the bucket name (default true). The property set_all_users_as_viewer controls if the bucket will be readable by all users (default false). The property labels set labels to organize buckets. The property tag_list set google tags to bind with the bucket for fine grained access control. Properties bucket_obj_vwr and bucket_obj_adm set a list of specific IAM members as objectViewers and objectAdmin"
 
   validation {
     # The Bucket name can contain only lower caps letters, numbers and "-" and "_". It also must start and end with a lower caps letter or number.

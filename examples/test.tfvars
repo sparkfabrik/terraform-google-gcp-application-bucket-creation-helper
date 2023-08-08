@@ -22,9 +22,9 @@ buckets_list = [
     name                    = "app-prod"
     storage_class           = "REGIONAL"
     set_all_users_as_viewer = false
-    tag_value_name_list = [
-      "123456789012345",
-      "098765432101234"
+    tag_list = [
+      "dev/editor",
+      "ops/admin"
     ]
     bucket_obj_adm = [
       "group:test-gcp-ops@test.example.com",
