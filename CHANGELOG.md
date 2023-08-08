@@ -3,13 +3,25 @@
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+and this project adheres
+to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+# [0.7.0] - 2023-08-08
+
+[Compare with previous version](https://github.com/sparkfabrik/terraform-google-gcp-application-bucket-creation-helper/compare/0.6.1...0.7.0)
+
+- **BREAKING CHANGES**: tags are now passed using a user-friendly name as 
+  `<TAG_KEY_SHORTNAME>/<TAG_VALUE_SHORTNAME>` instead of the tag value.
+- Support global tags to be applied to all buckets. If a bucket specify a list
+  of tags, the global tags will be overridden and replaced by those specified for
+  the bucket.
 
 # [0.6.1] - 2023-08-03
 
 [Compare with previous version](https://github.com/sparkfabrik/terraform-google-gcp-application-bucket-creation-helper/compare/0.6.0...0.6.1)
 
-- Removed `${bucket.bucket_location}--` from tag binding key since it can be null.
+- Removed `${bucket.bucket_location}--` from tag binding key since it can be
+  null.
 
 # [0.6.0] - 2023-07-28
 
@@ -27,8 +39,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [Compare with previous version](https://github.com/sparkfabrik/terraform-google-gcp-application-bucket-creation-helper/compare/0.3.0...0.4.0)
 
-- **ATTENTION - BREAKING CHANGE**: Remove the `roles/storage.objectViewer` role as default for all buckets.
-- Optionally the role `roles/storage.legacyObjectReader` can be added using the new `set_all_users_as_viewer` property in the `buckets_list` variable.
+- **ATTENTION - BREAKING CHANGE**: Remove the `roles/storage.objectViewer` role
+  as default for all buckets.
+- Optionally the role `roles/storage.legacyObjectReader` can be added using the
+  new `set_all_users_as_viewer` property in the `buckets_list` variable.
 
 ## [0.3.0] - 2023-05-23
 

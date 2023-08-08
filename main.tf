@@ -9,17 +9,7 @@ locals {
     bucket.append_random_suffix ? "${bucket.name}-${random_id.resources_suffix[bucket.name].hex}" : bucket.name
   }
 
-  generated_map_bucket_tags = distinct(flatten([
-    for bucket in var.buckets_list : [
-      for tag_value_name in bucket.tag_value_name_list : {
-        bucket_name     = local.generated_bucket_names[bucket.name]
-        bucket_location = bucket.location
-        tag_value_name  = tag_value_name
-      }
-    ]
-  ]))
-
-  generated_map_bucket_obj_admin = distinct(flatten([
+  generated_bucket_obj_admin_list = distinct(flatten([
     for bucket in var.buckets_list : [
       for bucket_obj_adm in bucket.bucket_obj_adm : {
         bucket_name    = local.generated_bucket_names[bucket.name]
@@ -28,7 +18,7 @@ locals {
     ]
   ]))
 
-  generated_map_bucket_obj_vwr = distinct(flatten([
+  generated_bucket_obj_vwr_list = distinct(flatten([
     for bucket in var.buckets_list : [
       for bucket_obj_vwr in bucket.bucket_obj_vwr : {
         bucket_name    = local.generated_bucket_names[bucket.name]
@@ -74,11 +64,70 @@ resource "google_storage_bucket" "application" {
 # ------------------------------
 # Binding Google Tags to buckets
 # ------------------------------
+locals {
+  # Get all the tags used in the single bucket and merge them with the global tags.
+  unique_tags_in_buckets_list = distinct(flatten([
+    for bucket in var.buckets_list : bucket.tag_list
+  ]))
+  all_used_unique_tags = distinct(concat(local.unique_tags_in_buckets_list, var.global_tags))
+
+  # Add the global tags to the buckets we want to tag and populate bucket location.
+  list_of_buckets_to_be_tagged = [
+    for bucket in var.buckets_list : {
+      bucket_name     = bucket.name
+      bucket_location = bucket.location != null ? bucket.location : local.default_region
+      # If the bucket has no tags, we add the global tags, otherwise we use the bucket tags.
+      tag_list        = length(bucket.tag_list) > 0 ? bucket.tag_list : var.global_tags
+    }
+  ]
+
+  # The map structure is something like:
+  # {
+  #   "bucket_name--tag_friendly_name" = {
+  #     bucket_name       = "bucket_name"
+  #     bucket_location   = "bucket_location"
+  #     tag_friendly_name = "tag_friendly_name"
+  #   },
+  #   "bucket_name--tag2_friendly_name" = {
+  # ...
+  # }
+  map_of_buckets_to_be_tagged = {
+    for obj in flatten([
+      for item in local.list_of_buckets_to_be_tagged : [
+        for tag in item.tag_list : {
+          bucket_name       = item.bucket_name
+          bucket_location   = item.bucket_location
+          tag_friendly_name = tag
+        }
+      ]
+    ]) : "${obj.bucket_name}--${obj.tag_friendly_name}" => obj
+  }
+}
+
+# Retrieve the tag keys for the tags that we are passing to the resources.
+# We split the friendly name we are passing to the module, to get the tag key shortname
+# as the index 0, and the tag value shortname as the index 1.
+# The friendly name is in the form <TAG_KEY_SHORTNAME>/<TAG_VALUE_SHORTNAME>
+data "google_tags_tag_key" "tag_keys" {
+  for_each   = toset(local.all_used_unique_tags)
+  parent     = "projects/${var.project_id}"
+  short_name = split("/", each.value)[0]
+}
+
+# To bind a tag to a resource, we need to know the tag value ID (something as
+# "tagValues/281483307043046"), that we can retrieve from this data source.
+data "google_tags_tag_value" "tag_values" {
+  for_each   = toset(local.all_used_unique_tags)
+  parent     = data.google_tags_tag_key.tag_keys[each.value].id
+  short_name = split("/", each.value)[1]
+}
+
+# Bind tags to buckets.
 resource "google_tags_location_tag_binding" "binding" {
-  for_each  = { for bucket in local.generated_map_bucket_tags : "${bucket.bucket_name}--${bucket.tag_value_name}" => bucket }
+  for_each  = local.map_of_buckets_to_be_tagged
   parent    = "//storage.googleapis.com/projects/_/buckets/${each.value.bucket_name}"
-  tag_value = "tagValues/${each.value.tag_value_name}"
-  location  = each.value.bucket_location != null ? each.value.bucket_location : local.default_region
+  location  = each.value.bucket_location
+  tag_value = data.google_tags_tag_value.tag_values[each.value.tag_friendly_name].id
 }
 
 # -------------------------------
@@ -129,7 +178,7 @@ resource "google_storage_bucket_iam_member" "viewer" {
 
 # Default Storage Admin Role
 resource "google_storage_bucket_iam_member" "default_storage_admin" {
-  for_each = { for bucket in local.generated_map_bucket_obj_admin : "${bucket.bucket_name}--${bucket.bucket_obj_admin}" => bucket }
+  for_each = { for bucket in local.generated_bucket_obj_admin_list : "${bucket.bucket_name}--${bucket.bucket_obj_admin}" => bucket }
   bucket   = google_storage_bucket.application[each.value.name].name
   role     = "roles/storage.objectAdmin"
   member   = each.value.bucket_obj_admin
@@ -137,7 +186,7 @@ resource "google_storage_bucket_iam_member" "default_storage_admin" {
 
 # Default Storage Viewer Role
 resource "google_storage_bucket_iam_member" "default_storage_viewer" {
-  for_each = { for bucket in local.generated_map_bucket_obj_vwr : "${bucket.bucket_name}--${bucket.bucket_obj_vwr}" => bucket }
+  for_each = { for bucket in local.generated_bucket_obj_vwr_list : "${bucket.bucket_name}--${bucket.bucket_obj_vwr}" => bucket }
   bucket   = google_storage_bucket.application[each.value.name].name
   role     = "roles/storage.objectViewer"
   member   = each.value.bucket_obj_vwr
