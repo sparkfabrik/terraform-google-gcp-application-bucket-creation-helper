@@ -74,7 +74,7 @@ locals {
   # Add the global tags to the buckets we want to tag and populate bucket location.
   list_of_buckets_to_be_tagged = [
     for bucket in var.buckets_list : {
-      bucket_name     = bucket.name
+      bucket_name     = local.generated_bucket_names[bucket.name]
       bucket_location = bucket.location != null ? bucket.location : local.default_region
       # If the bucket has no tags, we add the global tags, otherwise we use the bucket tags.
       tag_list        = length(bucket.tag_list) > 0 ? bucket.tag_list : var.global_tags
