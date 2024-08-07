@@ -98,7 +98,7 @@ want to import existing buckets with a known name.
 | <a name="output_buckets_access_credentials"></a> [buckets\_access\_credentials](#output\_buckets\_access\_credentials) | Access credentials for the application buckets |
 | <a name="output_details_of_used_tag_keys"></a> [details\_of\_used\_tag\_keys](#output\_details\_of\_used\_tag\_keys) | Details of all the tag keys passed to this module (globals and per bucket). |
 | <a name="output_details_of_used_tag_values"></a> [details\_of\_used\_tag\_values](#output\_details\_of\_used\_tag\_values) | Details of all the tag values passed to this module (globals and per bucket). |
-| <a name="output_generated_bucket_names"></a> [generated\_bucket\_names](#output\_generated\_bucket\_names) | Generated bucket names |
+| <a name="output_generated_bucket_names"></a> [generated\_bucket\_names](#output\_generated\_bucket\_names) | The list with the names of the buckets managed by this module. |
 ## Resources
 
 | Name | Type |
