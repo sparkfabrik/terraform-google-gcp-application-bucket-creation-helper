@@ -20,3 +20,8 @@ output "details_of_used_tag_values" {
   description = "Details of all the tag values passed to this module (globals and per bucket)."
   value       = data.google_tags_tag_value.tag_values
 }
+
+output "generated_bucket_names" {
+  description = "Generated bucket names"
+  value       = local.generated_bucket_names
+}
