@@ -22,6 +22,6 @@ output "details_of_used_tag_values" {
 }
 
 output "generated_bucket_names" {
-  description = "Generated bucket names"
+  description = "The list with the names of the buckets managed by this module."
   value       = local.generated_bucket_names
 }
