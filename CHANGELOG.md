@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+# [0.8.0] - 2024-08-09
+
+[Compare with previous version](https://github.com/sparkfabrik/terraform-google-gcp-application-bucket-creation-helper/compare/0.7.3...0.8.0)
+
+- Added `soft_delete_retention_seconds` property to manage bucket soft delete policy
+
 # [0.7.3] - 2024-08-08
 
 [Compare with previous version](https://github.com/sparkfabrik/terraform-google-gcp-application-bucket-creation-helper/compare/0.7.2...0.7.3)
