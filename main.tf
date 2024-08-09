@@ -47,6 +47,10 @@ resource "google_storage_bucket" "application" {
   force_destroy = each.value.force_destroy
   labels        = each.value.labels
 
+  soft_delete_policy {
+    retention_duration_seconds = each.value.soft_delete_retention_seconds
+  }
+
   versioning {
     enabled = each.value.enable_versioning
   }
