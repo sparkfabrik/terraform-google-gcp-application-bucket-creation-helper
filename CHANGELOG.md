@@ -10,7 +10,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 [Compare with previous version](https://github.com/sparkfabrik/terraform-google-gcp-application-bucket-creation-helper/compare/0.8.1...0.9.0)
 
-- Added lifecicle policy rules to buckets (default retention: 30 days after becoming non current)
+- Added lifecycle policy rules to buckets (default retention: 30 days after becoming non current)
 
 # [0.8.1] - 2024-10-29
 
