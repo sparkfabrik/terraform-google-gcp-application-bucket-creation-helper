@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+# [0.9.0] - 2024-11-26
+
+[Compare with previous version](https://github.com/sparkfabrik/terraform-google-gcp-application-bucket-creation-helper/compare/0.8.1...0.9.0)
+
+- Added lifecicle policy rules to buckets (default retention: 30 days after becoming non current)
+
 # [0.8.1] - 2024-10-29
 
 [Compare with previous version](https://github.com/sparkfabrik/terraform-google-gcp-application-bucket-creation-helper/compare/0.8.0...0.8.1)

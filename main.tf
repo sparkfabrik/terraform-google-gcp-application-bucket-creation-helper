@@ -55,6 +55,16 @@ resource "google_storage_bucket" "application" {
     enabled = each.value.enable_versioning
   }
 
+  lifecycle_rule {
+    action {
+      type = "Delete"
+    }
+    condition {
+      days_since_noncurrent_time = each.value.lifecycle_policy_retention
+      send_age_if_zero           = false
+    }
+  }
+
   dynamic "logging" {
     for_each = tolist(var.logging_bucket_name != "" ? [
       var.logging_bucket_name
