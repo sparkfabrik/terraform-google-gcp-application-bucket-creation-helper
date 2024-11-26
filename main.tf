@@ -226,9 +226,11 @@ resource "google_storage_bucket" "disaster_recovery" {
   location      = var.disaster_recovery_bucket_location != "" ? var.disaster_recovery_bucket_location : each.value.location != null ? each.value.location : local.default_region
   storage_class = each.value.storage_class
   force_destroy = each.value.force_destroy
+
   soft_delete_policy {
     retention_duration_seconds = each.value.dr_soft_delete_retention_seconds
   }
+
   lifecycle_rule {
     action {
       type = "Delete"
