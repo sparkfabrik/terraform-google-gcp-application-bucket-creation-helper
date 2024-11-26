@@ -238,6 +238,9 @@ resource "google_storage_bucket" "disaster_recovery" {
   versioning {
     enabled = true
   }
+  labels = {
+    scope = "dr"
+  }
 }
 
 # ----------------------------------------
