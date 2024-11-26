@@ -226,9 +226,22 @@ resource "google_storage_bucket" "disaster_recovery" {
   location      = var.disaster_recovery_bucket_location != "" ? var.disaster_recovery_bucket_location : each.value.location != null ? each.value.location : local.default_region
   storage_class = each.value.storage_class
   force_destroy = each.value.force_destroy
+  lifecycle_rule {
+    action {
+      type = "Delete"
+    }
+    condition {
+      days_since_noncurrent_time = each.value.dr_lifecycle_policy_retention
+      send_age_if_zero           = false
+    }
+  }
 
   versioning {
     enabled = true
+  }
+
+  labels = {
+    scope = "dr"
   }
 }
 

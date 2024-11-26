@@ -50,6 +50,7 @@ variable "buckets_list" {
     bucket_obj_vwr                = optional(list(string), [])
     soft_delete_retention_seconds = optional(number, 0)
     lifecycle_policy_retention    = optional(number, 30)
+    dr_lifecycle_policy_retention = optional(number, 60)
   }))
   description = "The list of buckets to create. For each bucket you can specify the name, when deleting a bucket the force_destroy option will delete the contents of the bucket (if you try to delete a bucket that contains objects, Terraform will fail that run), the location (default to project region), the storage class (default to STANDARD), if you want enable the object versioning (default to true), if you want to plan a disaster recovery with the creation of a mirroring bucket with a scheduled transfer job and if you want to append a random suffix to the bucket name (default true). The property set_all_users_as_viewer controls if the bucket will be readable by all users (default false). The property labels set labels to organize buckets. The property tag_list set google tags to bind with the bucket for fine grained access control. Properties bucket_obj_vwr and bucket_obj_adm set a list of specific IAM members as objectViewers and objectAdmin"
 
