@@ -1,3 +1,5 @@
+TERRAFORM_DOCS_IMAGE_TAG ?= 0.18.0
+
 .PHONY: lint tfscan generate-docs
 
 lint:
@@ -10,7 +12,7 @@ generate-docs: lint
 	docker run --rm -u $$(id -u) \
 		--volume "$(PWD):/terraform-docs" \
 		-w /terraform-docs \
-		quay.io/terraform-docs/terraform-docs:0.16.0 markdown table --config .terraform-docs.yml --output-file README.md --output-mode inject .
+		quay.io/terraform-docs/terraform-docs:$(TERRAFORM_DOCS_IMAGE_TAG) markdown table --config .terraform-docs.yml --output-file README.md --output-mode inject .
 
 # Renovate configuration test
 renovate-test:
