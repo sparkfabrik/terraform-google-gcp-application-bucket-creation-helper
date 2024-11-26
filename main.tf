@@ -235,9 +235,11 @@ resource "google_storage_bucket" "disaster_recovery" {
       send_age_if_zero           = false
     }
   }
+
   versioning {
     enabled = true
   }
+
   labels = {
     scope = "dr"
   }
