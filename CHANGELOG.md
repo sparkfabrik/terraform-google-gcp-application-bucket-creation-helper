@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+# [0.11.0] - 2025-12-10
+
+[Compare with previous version](https://github.com/sparkfabrik/terraform-google-gcp-application-bucket-creation-helper/compare/0.10.0...0.11.0)
+
+- Added `additional_transfer_job_excluded_prefixes` variable to allow excluding specific prefixes from the transfer job.
+
 # [0.10.0] - 2024-11-26
 
 [Compare with previous version](https://github.com/sparkfabrik/terraform-google-gcp-application-bucket-creation-helper/compare/0.9.0...0.10.0)
@@ -54,7 +60,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 [Compare with previous version](https://github.com/sparkfabrik/terraform-google-gcp-application-bucket-creation-helper/compare/0.6.1...0.7.0)
 
-- **BREAKING CHANGES**: tags are now passed using a user-friendly name as 
+- **BREAKING CHANGES**: tags are now passed using a user-friendly name as
   `<TAG_KEY_SHORTNAME>/<TAG_VALUE_SHORTNAME>` instead of the tag value.
 - Support global tags to be applied to all buckets. If a bucket specify a list
   of tags, the global tags will be overridden and replaced by those specified for

@@ -1,4 +1,4 @@
-# Data resources. 
+# Data resources.
 data "google_client_config" "current" {}
 
 locals {
@@ -294,7 +294,7 @@ resource "google_storage_transfer_job" "application_bucket_nightly_backup" {
 
   transfer_spec {
     object_conditions {
-      exclude_prefixes = var.transfer_job_excluded_prefixes
+      exclude_prefixes = concat(var.transfer_job_excluded_prefixes, var.additional_transfer_job_excluded_prefixes)
     }
 
     transfer_options {

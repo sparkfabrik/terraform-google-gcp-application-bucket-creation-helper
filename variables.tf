@@ -27,6 +27,12 @@ variable "transfer_job_excluded_prefixes" {
   ]
 }
 
+variable "additional_transfer_job_excluded_prefixes" {
+  type        = list(string)
+  description = "A list of additional object file and folder prefixes that will be excluded from the transfer job."
+  default     = []
+}
+
 variable "global_tags" {
   description = "A list of tags to be applied to all the resources, in the form <TAG_KEY_SHORTNAME>/<TAG_VALUE_SHORTNAME>. If a resource specify a list of tags, the global tags will be overridden and replaced by those specified in the resource."
   type        = list(string)
