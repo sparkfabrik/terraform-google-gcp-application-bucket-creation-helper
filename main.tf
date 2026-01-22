@@ -9,23 +9,23 @@ locals {
     bucket.append_random_suffix ? "${bucket.name}-${random_id.resources_suffix[bucket.name].hex}" : bucket.name
   }
 
-  generated_bucket_obj_admin_list = distinct(flatten([
+  generated_bucket_obj_admin_list = flatten([
     for bucket in var.buckets_list : [
       for bucket_obj_adm in bucket.bucket_obj_adm : {
-        bucket_name    = local.generated_bucket_names[bucket.name]
+        bucket_name    = bucket.name
         bucket_obj_adm = bucket_obj_adm
       }
     ]
-  ]))
+  ])
 
-  generated_bucket_obj_vwr_list = distinct(flatten([
+  generated_bucket_obj_vwr_list = flatten([
     for bucket in var.buckets_list : [
       for bucket_obj_vwr in bucket.bucket_obj_vwr : {
-        bucket_name    = local.generated_bucket_names[bucket.name]
+        bucket_name    = bucket.name
         bucket_obj_vwr = bucket_obj_vwr
       }
     ]
-  ]))
+  ])
 
 }
 
@@ -193,16 +193,16 @@ resource "google_storage_bucket_iam_member" "viewer" {
 
 # Default Storage Admin Role
 resource "google_storage_bucket_iam_member" "default_storage_admin" {
-  for_each = { for bucket in local.generated_bucket_obj_admin_list : "${bucket.bucket_name}--${bucket.bucket_obj_admin}" => bucket }
-  bucket   = google_storage_bucket.application[each.value.name].name
+  for_each = { for bucket in local.generated_bucket_obj_admin_list : "${bucket.bucket_name}--${bucket.bucket_obj_adm}" => bucket }
+  bucket   = google_storage_bucket.application[each.value.bucket_name].name
   role     = "roles/storage.objectAdmin"
-  member   = each.value.bucket_obj_admin
+  member   = each.value.bucket_obj_adm
 }
 
 # Default Storage Viewer Role
 resource "google_storage_bucket_iam_member" "default_storage_viewer" {
   for_each = { for bucket in local.generated_bucket_obj_vwr_list : "${bucket.bucket_name}--${bucket.bucket_obj_vwr}" => bucket }
-  bucket   = google_storage_bucket.application[each.value.name].name
+  bucket   = google_storage_bucket.application[each.value.bucket_name].name
   role     = "roles/storage.objectViewer"
   member   = each.value.bucket_obj_vwr
 }
