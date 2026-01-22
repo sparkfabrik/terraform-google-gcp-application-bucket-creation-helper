@@ -12,7 +12,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
-- Added output`disaster_recovery_bucket_names` to provide a map from input bucket names to disaster recovery bucket names.
+- Added output `disaster_recovery_bucket_names` to provide a map from input bucket names to disaster recovery bucket names.
 
 ### Fixed
 
