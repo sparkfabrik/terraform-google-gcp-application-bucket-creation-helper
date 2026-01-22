@@ -12,8 +12,8 @@ locals {
   generated_bucket_obj_admin_list = flatten([
     for bucket in var.buckets_list : [
       for bucket_obj_adm in bucket.bucket_obj_adm : {
-        bucket_name    = bucket.name
-        bucket_obj_adm = bucket_obj_adm
+        bucket_name      = bucket.name
+        bucket_obj_admin = bucket_obj_adm
       }
     ]
   ])
@@ -193,10 +193,10 @@ resource "google_storage_bucket_iam_member" "viewer" {
 
 # Default Storage Admin Role
 resource "google_storage_bucket_iam_member" "default_storage_admin" {
-  for_each = { for bucket in local.generated_bucket_obj_admin_list : "${bucket.bucket_name}--${bucket.bucket_obj_adm}" => bucket }
+  for_each = { for bucket in local.generated_bucket_obj_admin_list : "${bucket.bucket_name}--${bucket.bucket_obj_admin}" => bucket }
   bucket   = google_storage_bucket.application[each.value.bucket_name].name
   role     = "roles/storage.objectAdmin"
-  member   = each.value.bucket_obj_adm
+  member   = each.value.bucket_obj_admin
 }
 
 # Default Storage Viewer Role
