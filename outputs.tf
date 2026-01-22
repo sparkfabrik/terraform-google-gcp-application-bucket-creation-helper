@@ -26,17 +26,7 @@ output "generated_bucket_names" {
   value       = [for k, v in local.generated_bucket_names : v]
 }
 
-output "generated_bucket_names_map" {
-  description = "Map from input bucket name to generated bucket name (with random suffix if enabled)."
-  value       = local.generated_bucket_names
-}
-
 output "disaster_recovery_bucket_names" {
-  description = "The list with the names of the disaster recovery buckets."
-  value       = [for k, bucket in google_storage_bucket.disaster_recovery : bucket.name]
-}
-
-output "disaster_recovery_bucket_names_map" {
-  description = "Map from input bucket name to disaster recovery bucket name."
+  description = "Map from input bucket name to disaster recovery bucket name. Use values() to get a list."
   value       = { for k, bucket in google_storage_bucket.disaster_recovery : k => bucket.name }
 }

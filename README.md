@@ -99,10 +99,8 @@ want to import existing buckets with a known name.
 | <a name="output_buckets_access_credentials"></a> [buckets\_access\_credentials](#output\_buckets\_access\_credentials) | Access credentials for the application buckets |
 | <a name="output_details_of_used_tag_keys"></a> [details\_of\_used\_tag\_keys](#output\_details\_of\_used\_tag\_keys) | Details of all the tag keys passed to this module (globals and per bucket). |
 | <a name="output_details_of_used_tag_values"></a> [details\_of\_used\_tag\_values](#output\_details\_of\_used\_tag\_values) | Details of all the tag values passed to this module (globals and per bucket). |
-| <a name="output_disaster_recovery_bucket_names"></a> [disaster\_recovery\_bucket\_names](#output\_disaster\_recovery\_bucket\_names) | The list with the names of the disaster recovery buckets. |
-| <a name="output_disaster_recovery_bucket_names_map"></a> [disaster\_recovery\_bucket\_names\_map](#output\_disaster\_recovery\_bucket\_names\_map) | Map from input bucket name to disaster recovery bucket name. |
+| <a name="output_disaster_recovery_bucket_names"></a> [disaster\_recovery\_bucket\_names](#output\_disaster\_recovery\_bucket\_names) | Map from input bucket name to disaster recovery bucket name. Use values() to get a list. |
 | <a name="output_generated_bucket_names"></a> [generated\_bucket\_names](#output\_generated\_bucket\_names) | The list with the names of the buckets managed by this module. |
-| <a name="output_generated_bucket_names_map"></a> [generated\_bucket\_names\_map](#output\_generated\_bucket\_names\_map) | Map from input bucket name to generated bucket name (with random suffix if enabled). |
 ## Resources
 
 | Name | Type |
