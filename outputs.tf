@@ -25,3 +25,8 @@ output "generated_bucket_names" {
   description = "The list with the names of the buckets managed by this module."
   value       = [for k, v in local.generated_bucket_names : v]
 }
+
+output "disaster_recovery_bucket_names" {
+  description = "Map from input bucket name to disaster recovery bucket name. Use values() to get a list."
+  value       = { for k, bucket in google_storage_bucket.disaster_recovery : k => bucket.name }
+}

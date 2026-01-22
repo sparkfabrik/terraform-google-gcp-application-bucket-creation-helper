@@ -10,6 +10,10 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 [Compare with previous version](https://github.com/sparkfabrik/terraform-google-gcp-application-bucket-creation-helper/compare/0.11.0...0.12.0)
 
+### Added
+
+- Added output `disaster_recovery_bucket_names` to provide a map from input bucket names to disaster recovery bucket names.
+
 ### Fixed
 
 - Fixed `bucket_obj_adm` and `bucket_obj_vwr` variables causing "Invalid for_each argument" error when used with `append_random_suffix = true`. The `for_each` key for IAM member resources now uses the static input bucket name instead of the dynamically generated name (with random suffix).
