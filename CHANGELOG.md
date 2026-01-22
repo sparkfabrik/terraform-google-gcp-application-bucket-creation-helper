@@ -6,6 +6,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+# [0.12.0] - 2026-01-22
+
+[Compare with previous version](https://github.com/sparkfabrik/terraform-google-gcp-application-bucket-creation-helper/compare/0.11.0...0.12.0)
+
+### Fixed
+
+- Fixed `bucket_obj_adm` and `bucket_obj_vwr` variables causing "Invalid for_each argument" error when used with `append_random_suffix = true`. The `for_each` key for IAM member resources now uses the static input bucket name instead of the dynamically generated name (with random suffix).
+
+### Changed
+
+- **BREAKING CHANGE for existing users of `bucket_obj_adm`/`bucket_obj_vwr`**: The `for_each` key for `google_storage_bucket_iam_member.default_storage_admin` and `google_storage_bucket_iam_member.default_storage_viewer` resources has changed from `<generated_bucket_name>--<member>` to `<input_bucket_name>--<member>`.
+
+  **Example**: If your bucket input name is `myapp` and it gets a random suffix `a1b2`, the key changes from `myapp-a1b2--group:admins@example.com` to `myapp--group:admins@example.com`.
+
+  **Impact**: Terraform will plan to destroy and recreate the IAM bindings. This is safe - the IAM permissions will be briefly removed and immediately recreated. No data loss occurs.
+
+  **Migration**: No action required. Run `terraform apply` to recreate the IAM bindings with the new keys. If you want to avoid the brief permission gap, you can use `terraform state mv` to rename the resources before applying.
+
 # [0.11.0] - 2025-12-10
 
 [Compare with previous version](https://github.com/sparkfabrik/terraform-google-gcp-application-bucket-creation-helper/compare/0.10.0...0.11.0)
